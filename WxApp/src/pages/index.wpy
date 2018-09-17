@@ -1,0 +1,104 @@
+<style lang="less">
+  .rank-item {
+    height: 200rpx;
+    padding: 40rpx;
+    display: flex;
+    justify-content: flex-start;
+    align-items:center;
+    border-bottom: 1px solid #EEE;
+  }
+  .rank-head {
+    width: 160rpx;
+    height: 160rpx;
+  }
+  .detail {
+    width: 500rpx;
+    display:flex;
+    flex-direction:column;
+    height: 160rpx;
+    justify-content: space-between;
+  }
+  .level {
+    border-radius:5px;
+    background-color: rgba(9,187,7,0.8);
+    height: 50rpx;
+    overflow:hidden; //超出一行文字自动隐藏
+    text-overflow:ellipsis;//文字隐藏后添加省略号
+    white-space:nowrap;  //强制不换行
+    font-size: 24rpx;
+    color: #ffffff;
+    line-height: 50rpx;
+    padding: 0 10rpx;
+  }
+  .amount,.account,.usd {
+    color: #666666;
+    overflow:hidden; //超出一行文字自动隐藏
+    text-overflow:ellipsis;//文字隐藏后添加省略号
+    white-space:nowrap;  //强制不换行
+  }
+  .amount,.usd {
+    font-size: 34rpx;
+  }
+  .rank_index {
+    position: absolute;
+    left: 110rpx;
+    color: #ffffff;
+  }
+</style>
+<template>
+  <view class="container">
+    <repeat for="{{list}}" index="index" item="item" key="row-{{index}}">
+      <view class="rank-item">
+        <image class="rank-head" src="../images/level.png" />
+        <text class="rank_index">{{index+1}}</text>
+        <view class="detail">
+          <view class="level" style="width: {{item.balance/max*500}}rpx">{{item.address}}</view>
+          <view class="money">
+            <text class="amount">{{ff.moneyFilter(item.balance)}} BTC</text> / <text class="usd">${{ff.moneyFilter(item.usd)}}</text>
+          </view>
+        </view>
+      </view>
+    </repeat>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import filter from '../wxs/filter.wxs'
+  import api from '../api/api'
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '富豪榜'
+    }
+    components = {
+    }
+
+    mixins = []
+    wxs = {
+      ff: filter
+    }
+    data = {
+      max: 100000,
+      list: [
+      ],
+    }
+
+    computed = {
+    }
+
+    methods = {
+
+    }
+
+    events = {
+    }
+
+    async onLoad() {
+      let res =  await api.rank();
+      this.list = res;
+      this.max = res[0].balance;
+      this.$apply();
+      console.log(res);
+    }
+  }
+</script>

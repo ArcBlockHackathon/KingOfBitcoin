@@ -1,0 +1,133 @@
+<style lang="less">
+  .userinfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 230rpx;
+    /*border-bottom: 1px solid #EEE;*/
+  }
+
+  .userinfo-avatar {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 50%;
+  }
+
+  .userinfo-nickname {
+    color: #aaa;
+  }
+  .balance {
+    padding: 40rpx 40rpx;
+    display: flex;
+    flex-direction: row;
+    border-top: 1px solid #eee;
+    box-sizing:border-box;
+    text-align:left;
+    /*margin-top:10rpx;*/
+    justify-content: space-between;
+  }
+  .title {
+    padding:20rpx;
+    font-size:28rpx;
+    display:block;
+  }
+  .amount {
+    font-size: 40rpx;
+    align-self: center;
+  }
+  .show {
+    align-self: center;
+  }
+  .pre {
+    display: flex;
+  }
+  .bt-icon {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 50%;
+  }
+  .percent {
+    font-size: 50rpx;
+    align-self:flex-end;
+  }
+  h1 {
+    border-bottom: 1px solid #eee;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="userinfo" @tap="handleViewTap">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    </view>
+    <view class="balance">
+      <input @input="input" placeholder="请输入您的账户地址"/>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Panel from 'kai-ui/Panel'
+  import List from '../components/list' // aliasFields example
+  import Group from '../components/group'
+  import Toast from 'wepy-com-toast'
+  import Icon from 'kai-ui/Icon'
+
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '账户'
+    }
+    components = {
+      panel: Panel,
+      list: List,
+      group: Group,
+      toast: Toast,
+      icon:Icon,
+    }
+
+    mixins = []
+
+    data = {
+      mynum: 20,
+      userInfo: {
+        nickName: '加载中...'
+      },
+      showBalance:true,
+      account:null,
+      detail:{},
+    }
+
+    computed = {
+    }
+
+    methods = {
+      input:function(e) {
+        console.log(e);
+      },
+    }
+
+    events = {
+      'icon-tap':function(e) {
+        this.showBalance = !this.showBalance;
+        this.$apply();
+      },
+    }
+
+    onLoad() {
+      if(!this.account) {
+        wx.navigateTo({
+          url: './input',
+        })
+      }
+      let self = this
+      this.$parent.getUserInfo(function (userInfo) {
+        if (userInfo) {
+          self.userInfo = userInfo
+        }
+        self.$apply()
+      })
+    }
+  }
+</script>

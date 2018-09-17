@@ -1,0 +1,150 @@
+<style lang="less">
+  .userinfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 230rpx;
+    /*border-bottom: 1px solid #EEE;*/
+  }
+
+  .userinfo-avatar {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 50%;
+  }
+
+  .userinfo-nickname {
+    color: #aaa;
+  }
+  .balance {
+    padding: 40rpx 40rpx;
+    display: flex;
+    flex-direction: row;
+    border-top: 1px solid #eee;
+    box-sizing:border-box;
+    text-align:left;
+    /*margin-top:10rpx;*/
+    justify-content: space-between;
+  }
+  .title {
+    padding:20rpx;
+    font-size:28rpx;
+    display:block;
+  }
+  .amount {
+    font-size: 40rpx;
+    align-self: center;
+  }
+  .show {
+    align-self: center;
+  }
+  .pre {
+    display: flex;
+  }
+  .bt-icon {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 50%;
+  }
+  .percent {
+    font-size: 50rpx;
+    align-self:flex-end;
+  }
+  h1 {
+    border-bottom: 1px solid #eee;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="userinfo" @tap="handleViewTap">
+      <image class="userinfo-avatar" src="../images/img.jpg" background-size="cover"/>
+      <view class="userinfo-nickname">Kevin</view>
+    </view>
+    <view class="balance">
+      <view class="pre">
+        <view class="title">Balance:</view>
+        <view class="amount">{{showBalance?ff.moneyFilter(detail.balance):'*****'}}</view></view>
+      <icon class="show" type="display" event="icon-tap"></icon>
+    </view>
+    <view class="balance">
+      <image class="bt-icon" mode="aspectFit" src="../images/btc.jpeg"></image>
+      <view class="percent">{{detail.whole_web_percentage}}%</view>
+    </view>
+    <view class="balance">
+      <view class="percent">{{detail.rank_in_friends}}/{{detail.total_friend_count}}</view>
+      <image class="bt-icon" src="../images/circle.png"></image>
+    </view>
+    <h1></h1>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Panel from 'kai-ui/Panel'
+  import List from '../components/list' // aliasFields example
+  import Group from '../components/group'
+  import Toast from 'wepy-com-toast'
+  import Icon from 'kai-ui/Icon'
+  import api from '../api/api'
+  import filter from '../wxs/filter.wxs'
+
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'PROFILE'
+    }
+    components = {
+      panel: Panel,
+      list: List,
+      group: Group,
+      toast: Toast,
+      icon:Icon,
+    }
+
+    mixins = []
+    wxs = {
+      ff: filter
+    }
+    data = {
+      mynum: 20,
+      userInfo: {
+        nickName: '加载中...'
+      },
+      showBalance:true,
+      account:'17kb7c9ndg7ioSuzMWEHWECdEVUegNkcGc',
+      detail:{
+        balance: "0.72212767750000299972",
+        usd: 156.38798549392797,
+        whole_web_percentage: 84,
+        total_friend_count: 42,
+        rank_in_friends: 7
+      },
+    }
+
+    computed = {
+    }
+
+    methods = {}
+
+    events = {
+      'icon-tap':function(e) {
+        this.showBalance = !this.showBalance;
+        this.$apply();
+      },
+    }
+
+    async onLoad() {
+      let self = this
+      this.$parent.getUserInfo(function (userInfo) {
+        if (userInfo) {
+          self.userInfo = userInfo
+        }
+        self.$apply()
+      })
+      let res = await api.account(this.account);
+      console.log('res',res);
+      this.detail = res;
+      this.$apply();
+    }
+  }
+</script>
